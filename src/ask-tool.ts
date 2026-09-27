@@ -14,7 +14,9 @@ import {
 	validateParams,
 } from "./ask-tool-helpers.ts";
 import { getAskConfigStore } from "./config/store.ts";
+import { REMOTE_ASK_TIMEOUT_NOTICE } from "./constants/text.ts";
 import type { RemoteAskRuntime } from "./remote-ask.ts";
+import { runRemoteAskFlow } from "./remote-headless.ts";
 import { AskParamsSchema } from "./schema.ts";
 import { prepareAskParams } from "./state/normalize.ts";
 import type { AskParams } from "./types.ts";
@@ -70,6 +72,28 @@ async function executeAskTool(
 		sourceEntryId: toolCallId,
 	});
 	if (ctx.mode !== "tui") {
+		// Non-terminal hosts with a UI transport (a `pi --mode rpc` child whose
+		// bridge mirrors interactive frames to a paired app) can still answer:
+		// drive pi-ask's remote event contract headlessly. Everything else keeps
+		// the textual fallback.
+		if (remoteAsk && ctx.mode === "rpc") {
+			const outcome = await runRemoteAskFlow(
+				params,
+				{
+					presentSingleAsMulti: config.behaviour.presentSingleAsMulti,
+					remote: { runtime: remoteAsk, source: "tool", toolCallId },
+				},
+				_signal
+			);
+			if (outcome.kind === "expired") {
+				ctx.ui.notify(REMOTE_ASK_TIMEOUT_NOTICE, "warning");
+				return nonInteractiveResponse(
+					validation.state,
+					REMOTE_ASK_TIMEOUT_NOTICE
+				);
+			}
+			return successfulResponse(outcome.result);
+		}
 		return nonInteractiveResponse(validation.state);
 	}
 	ctx.ui.setWorkingVisible(false);

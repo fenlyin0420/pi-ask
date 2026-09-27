@@ -10,3 +10,5 @@ export const ELABORATED_SUMMARY = "User asked for elaboration based on notes";
 export const CANCELLED_RESULT_TEXT = "Cancelled";
 export const SUBMITTED_RESULT_TEXT = "Submitted";
 export const ELABORATED_RESULT_TEXT = "Elaboration requested";
+export const REMOTE_ASK_TIMEOUT_NOTICE =
+	"No remote client answered ask_user in time. Ask these questions in plain text instead, or retry the tool call.";

@@ -62,11 +62,15 @@ export function invalidPayloadResponse(
 }
 
 export function nonInteractiveResponse(
-	state: ReturnType<typeof createInitialState>
+	state: ReturnType<typeof createInitialState>,
+	notice?: string
 ) {
 	return {
 		content: [
-			{ type: "text" as const, text: formatNonInteractiveMessage(state) },
+			{
+				type: "text" as const,
+				text: formatNonInteractiveMessage(state, notice),
+			},
 		],
 		details: {
 			...toAskResult(state),
@@ -151,12 +155,16 @@ function formatValidationError(issues: AskValidationIssue[]): string {
 }
 
 function formatNonInteractiveMessage(
-	state: ReturnType<typeof createInitialState>
+	state: ReturnType<typeof createInitialState>,
+	notice?: string
 ): string {
 	const lines = [
 		"Needs user input: ask_user requires interactive TUI mode.",
 		"Run same tool call in interactive TUI mode, or ask user these questions manually:",
 	];
+	if (notice) {
+		lines.unshift(notice);
+	}
 
 	for (const [index, question] of state.questions.entries()) {
 		lines.push(`${index + 1}. ${question.label}: ${question.prompt}`);

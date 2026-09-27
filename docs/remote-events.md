@@ -4,6 +4,15 @@ pi-ask exposes a local `pi.events` contract for trusted Pi extensions that run i
 
 Use this for local bridges: status cards, desktop helpers, or approval UIs. Do not use terminal keystroke automation. pi-ask does not expose a network API.
 
+## Hosts without a terminal
+
+In `tui` mode the ask flow is a custom component: the dialog lives in the terminal and a bridge mirrors it to another surface. A non-terminal host with a UI transport — `ctx.mode === "rpc"`, which is how remote hosts run Pi — has no terminal to draw in, so it drives this contract directly instead: `ask_user` publishes `started` and waits for a `submit` (`src/remote-headless.ts`).
+
+Two consequences worth knowing when bridging such a host:
+
+- An unanswered flow expires after ten minutes (`PI_ASK_REMOTE_TIMEOUT_MS` overrides it) so an unattended client cannot park the agent's turn forever. `ask_user` then falls back to the non-interactive text form and the flow is `completed` with a cancelled result, so a late submit gets `flow_not_found`.
+- Per-question dialogs (`ctx.ui.select` and friends) are not used in this path: the full question set rides in `started`, and one `submit` ends the flow, exactly like submitting in the TUI.
+
 ## Channels
 
 Lifecycle:

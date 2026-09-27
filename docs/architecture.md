@@ -15,6 +15,7 @@ The codebase is split so the implementation reads through file boundaries and na
 
 - `src/index.ts` — extension entrypoint
 - `src/ask-tool.ts` — tool registration, non-interactive fallback, transcript rendering, ask payload capture
+- `src/remote-headless.ts` — remote-only ask flow for non-terminal hosts (`rpc` mode): no custom component, one `submit` resolves the tool call
 - `src/answer-commands.ts` — `/answer`, `/answer:again`, and `/ask:replay` command wiring
 - `src/answer-extraction.ts` — configured, session-scope-aware extraction model selection, synthetic `ask_user` tool-call extraction, and tolerant text fallback
 - `src/ask-payload-store.ts` — branch-aware persisted ask payload lookup
