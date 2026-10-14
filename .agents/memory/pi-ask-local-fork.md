@@ -23,8 +23,9 @@ remote-pi 那边现成的 `extension_ui_bridge`（started/submit/submit-result/c
   **没有构建步骤**，`package.json` 的 `pi.extensions` 直接指 `./src/index.ts`，Pi 用 jiti 加载 TS。
   `FORK.md`（`dev` 上）写清了定制内容、本机安装方式与同步上游的命令。
   **用户明确要求：不提 PR 给上游**（长期自用二次开发，按 fork 技能走）。
-- 加载：`~/.pi/agent/settings.json` 的 `packages` 已把 `"npm:@eko24ive/pi-ask"`
-  换成 `"/home/fenlyin/Documents/GitHub/pi-ask"`（备份 `/tmp/settings.json.bak-*`）。
+- 加载：`~/.pi/agent/settings.json` 的 `packages` 里是 `"git:github.com/fenlyin0420/pi-ask@dev"`
+  （2026-10-14 从本地路径换成 GitHub 源，克隆在 `~/.pi/agent/git/github.com/fenlyin0420/pi-ask`，
+  已 checkout `dev`）。改完要 push `dev` + `pi update --extensions` 才进 pi。
 - 新增 `src/remote-headless.ts`：非 TUI 且有 remote runtime 时，走事件契约发
   `started`、await 一次 `submit`/`cancel`；10 分钟无应答
   （`PI_ASK_REMOTE_TIMEOUT_MS` 可覆盖）退回纯文本并 `completed`（后续 submit 收到
