@@ -57,6 +57,59 @@ test("empty typing mode uses arrows and tab for navigation", () => {
 	});
 });
 
+test("vim j and k move options outside editors", () => {
+	const navigation = createInitialState({
+		questions: [
+			{
+				id: "q1",
+				prompt: "Question?",
+				options: [
+					{ value: "a", label: "A" },
+					{ value: "b", label: "B" },
+				],
+			},
+		],
+	});
+	const input = inputState();
+
+	assert.deepEqual(getInputCommand(navigation, DEFAULT_ASK_CONFIG, "j"), {
+		kind: "moveOption",
+		delta: 1,
+	});
+	assert.deepEqual(getInputCommand(navigation, DEFAULT_ASK_CONFIG, "k"), {
+		kind: "moveOption",
+		delta: -1,
+	});
+	assert.deepEqual(getInputCommand(input, DEFAULT_ASK_CONFIG, "j", ""), {
+		kind: "delegateToEditor",
+	});
+	assert.deepEqual(getInputCommand(input, DEFAULT_ASK_CONFIG, "j", "just"), {
+		kind: "delegateToEditor",
+	});
+});
+
+test("vim j and k move review actions", () => {
+	let state = createInitialState({
+		questions: [
+			{
+				id: "q1",
+				prompt: "Question?",
+				options: [{ value: "a", label: "A" }],
+			},
+		],
+	});
+	state = moveTab(state, 1);
+
+	assert.deepEqual(getInputCommand(state, DEFAULT_ASK_CONFIG, "j"), {
+		kind: "moveOption",
+		delta: 1,
+	});
+	assert.deepEqual(getInputCommand(state, DEFAULT_ASK_CONFIG, "k"), {
+		kind: "moveOption",
+		delta: -1,
+	});
+});
+
 test("non-empty typing mode keeps arrows and tab in editor", () => {
 	const input = inputState();
 
@@ -408,6 +461,66 @@ test("review-tab elaborate input appends text and submits end to end", async () 
 		assert.equal(result.mode, "submit");
 		assert.equal(result.note, "also the CLI");
 		assert.deepEqual(result.answers.q1?.values, ["a"]);
+	} finally {
+		getAskConfigStore().setConfig(DEFAULT_ASK_CONFIG);
+	}
+});
+
+test("vim j moves the option selection end to end", async () => {
+	getAskConfigStore().setConfig({
+		...DEFAULT_ASK_CONFIG,
+		notifications: {
+			...DEFAULT_ASK_CONFIG.notifications,
+			enabled: false,
+		},
+	});
+	let component: { handleInput(data: string): void } | undefined;
+
+	try {
+		const resultPromise = runAskFlow(
+			{
+				cwd: process.cwd(),
+				mode: "tui",
+				ui: {
+					custom(callback: (...args: unknown[]) => unknown) {
+						return new Promise((resolve) => {
+							component = callback(
+								{
+									requestRender() {
+										// Rendering is not needed for this controller test.
+									},
+								},
+								plainTheme(),
+								{},
+								resolve
+							) as typeof component;
+						});
+					},
+				},
+			} as never,
+			{
+				questions: [
+					{
+						id: "q1",
+						prompt: "Question?",
+						options: [
+							{ value: "a", label: "A" },
+							{ value: "b", label: "B" },
+							{ value: "c", label: "C" },
+						],
+					},
+				],
+			}
+		);
+
+		await new Promise((resolve) => setImmediate(resolve));
+		assert(component);
+		component.handleInput("j");
+		component.handleInput("\r");
+		component.handleInput("\r");
+		const result = await resultPromise;
+
+		assert.deepEqual(result.answers.q1?.values, ["b"]);
 	} finally {
 		getAskConfigStore().setConfig(DEFAULT_ASK_CONFIG);
 	}

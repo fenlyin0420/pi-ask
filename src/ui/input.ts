@@ -9,6 +9,8 @@ import {
 } from "../constants/keymaps.ts";
 import type { AskState } from "../types.ts";
 
+const VIM_LIST_NAV = { down: "j", up: "k" } as const;
+
 export type AskInputCommand =
 	| { kind: "moveTab"; delta: 1 | -1 }
 	| { kind: "moveOption"; delta: 1 | -1 }
@@ -153,8 +155,23 @@ function getNavigationInputCommand(
 		return { kind: "openOptionNote" };
 	}
 
+	return getFixedNavigationCommand(data);
+}
+
+function getFixedNavigationCommand(data: string): AskInputCommand {
 	const digit = matchesDigitShortcut(data);
-	return digit === null
-		? { kind: "ignore" }
-		: { kind: "numberShortcut", digit };
+	if (digit !== null) {
+		return { kind: "numberShortcut", digit };
+	}
+	return getVimListNavCommand(data) ?? { kind: "ignore" };
+}
+
+function getVimListNavCommand(data: string): AskInputCommand | undefined {
+	if (data === VIM_LIST_NAV.down) {
+		return { kind: "moveOption", delta: 1 };
+	}
+	if (data === VIM_LIST_NAV.up) {
+		return { kind: "moveOption", delta: -1 };
+	}
+	return;
 }

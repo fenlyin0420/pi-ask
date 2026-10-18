@@ -246,6 +246,8 @@ Main flow:
 - `main.changeQuestionType` changes the active question type (non-preview: `single <-> multi`; preview: `preview <-> multi`); default: `t`; destructive `multi -> single` changes require pressing the type hotkey again, with no timeout, and the pending confirmation clears on other navigation/actions
 - `main.optionNote` and `main.questionNote` open option/question notes; defaults: `n`, `Shift+N`
 - `1..9` is fixed and selects or toggles the matching option; on the review tab, `1`, `2`, and `3` select `Submit`, `Elaborate` (opens the inline appended-text editor), and `Cancel`
+- `j` / `k` are fixed and move to the next / previous option or review action, matching pi's vim list navigation; they never apply while an editor is open, so `j` and `k` stay ordinary characters when typing an answer or note
+- configured `main.nextOption` / `main.previousOption` bindings take precedence over the fixed `j` / `k` keys
 - when `Double-press review shortcuts` is enabled, review-tab `1`, `2`, and `3` require the same key twice without a timeout, and the review screen shows an inline hint for the pending action
 
 Editing flow:

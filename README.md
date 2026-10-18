@@ -123,6 +123,7 @@ Fixed bindings:
 |---|---|---|
 | `1..9` | Options list | Select or toggle matching option |
 | `1` `2` `3` | Review tab | Trigger `Submit` / `Elaborate` (opens the inline input) / `Cancel` |
+| `j` `k` | Options list / Review tab | Move to the next / previous option or review action (not while an editor is open) |
 | `↑` `↓` | Review tab | Move between `Submit`, `Elaborate`, and `Cancel` |
 | `@` | Editors | File-reference affordance |
 | Arrow keys / `Tab` | Non-empty editor | Stay in editor for cursor movement |

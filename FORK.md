@@ -30,6 +30,14 @@ Review 页的 `Elaborate` 就地展开成和题目里 `Type your own` 一样的�
 `result-format.ts`、`ui/{render,render-submit,view-models/review,input,controller,dismiss-guard,auto-submit}.ts`。
 上游改动这些文件时优先手抄上游逻辑，再把这行追加输入接回去。
 
+### `feat: vim j/k navigation`
+
+题目选项和 review 页动作支持用 `j` / `k` 上下移动（等价 `main.nextOption` /
+`main.previousOption`）。只在编辑器未打开时生效，所以自由输入和 note 里 `j` / `k`
+仍然正常打字。上游没有这套固定键（上游 picker 用 pi-tui 的 `matchesVimListNav`，
+但本地 clone 解析到的是旧版 pi-tui，拿不到 vim 全局状态），冲突时看
+`ui/input.ts` 的 `VIM_LIST_NAV` 与 `getFixedNavigationCommand`。
+
 ## 本机安装方式
 
 `~/.pi/agent/settings.json` 的 `packages` 里用**本地路径包**指向本仓库，而不是 `npm:@eko24ive/pi-ask`。
