@@ -18,6 +18,7 @@ import type { AskParams } from "../src/types.ts";
 
 const NON_INTERACTIVE_MESSAGE_RE = /requires interactive TUI mode/;
 const SPEED_OPTION_RE = /\[speed\]/;
+const APPENDED_NOTE_RE = /User added: "also update the changelog"/;
 const HAS_UI = "hasUI";
 
 class TestEventBus {
@@ -138,6 +139,20 @@ function answerSubmit(flowId: string, value: string) {
 	};
 }
 
+function elaborateSubmit(flowId: string, note: string) {
+	return {
+		version: 1,
+		requestId: "request-1",
+		flowId,
+		response: {
+			kind: "answer",
+			mode: "elaborate",
+			answers: { goal: { values: ["speed"] } },
+			note,
+		},
+	};
+}
+
 test("rpc mode answers ask_user through the remote flow instead of the text fallback", async () => {
 	getAskConfigStore().setConfig({
 		...DEFAULT_ASK_CONFIG,
@@ -176,6 +191,36 @@ test("rpc mode answers ask_user through the remote flow instead of the text fall
 	assert.deepEqual(bus.submitResults(), [
 		{ version: 1, requestId: "request-1", flowId: "tool:call-1", ok: true },
 	]);
+
+	getAskConfigStore().setConfig(DEFAULT_ASK_CONFIG);
+});
+
+test("a remote whole-ask note on an elaborate submit reaches the agent", async () => {
+	getAskConfigStore().setConfig({
+		...DEFAULT_ASK_CONFIG,
+		notifications: { ...DEFAULT_ASK_CONFIG.notifications, enabled: false },
+	});
+	const bus = new TestEventBus();
+	const tool = registerToolWithRemote(bus);
+
+	const pending = tool.execute(
+		"call-1",
+		sampleParams(),
+		undefined,
+		undefined,
+		rpcCtx()
+	);
+	await tick();
+	const flowId = bus.started()?.flowId ?? "";
+
+	bus.emit(
+		PI_ASK_SUBMIT_EVENT,
+		elaborateSubmit(flowId, "also update the changelog")
+	);
+	const result = await pending;
+
+	assert.match(result.content[0]?.text ?? "", APPENDED_NOTE_RE);
+	assert.equal(bus.completed()?.result.note, "also update the changelog");
 
 	getAskConfigStore().setConfig(DEFAULT_ASK_CONFIG);
 });

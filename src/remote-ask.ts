@@ -535,6 +535,7 @@ function parseRemoteResponse(
 				kind: "answer",
 				answers: data.answers as Record<string, RemoteAskAnswer>,
 				mode: data.mode as "submit" | "elaborate" | undefined,
+				note: data.note as string | undefined,
 			},
 		};
 	}
