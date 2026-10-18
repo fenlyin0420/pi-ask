@@ -202,7 +202,7 @@ This document defines the stable external behavior. It does not explain internal
 - once prior answers narrow the branch, agents should bundle the next 2-3 related unresolved questions into one follow-up ask when possible, instead of using a long sequence of single-question asks
 - `elaboration` is only present when `mode === "elaborate"`
 - elaborate `content` text and transcript rendering describe each note directly using the full question prompt and option label, and include the current committed answer text when available, instead of a generic elaboration banner
-- when the user selects `Elaborate` without adding notes, elaborate `content` text and transcript rendering still include the committed answer text so the agent can elaborate on that answer directly
+- selecting `Elaborate` opens the optional note editor first; saving it (possibly empty) commits an `elaborate` result whose `content` text and transcript rendering still include the committed answer text so the agent can elaborate on that answer directly
 
 ## Supported UX
 
@@ -241,11 +241,11 @@ Main flow:
 - `global.dismiss` dismisses the active ask surface; default: `Ctrl+C`
 - `main.nextTab` / `main.previousTab` move between tabs; defaults: `Tab`/`Right`, `Shift+Tab`/`Left`
 - `main.nextOption` / `main.previousOption` move between options, review actions, and the optional note row on the review tab; defaults: `Down`, `Up`
-- on the review tab, the optional note row follows `Cancel` and opens the note editor on confirm
+- on the review tab, the optional note row follows `Cancel` and opens the note editor on confirm; the `Elaborate` action opens the same editor and commits an elaborate result on save
 - `main.confirm`, `main.cancel`, and `main.toggle` confirm, cancel, or toggle; defaults: `Enter`, `Esc`, `Space`
 - `main.changeQuestionType` changes the active question type (non-preview: `single <-> multi`; preview: `preview <-> multi`); default: `t`; destructive `multi -> single` changes require pressing the type hotkey again, with no timeout, and the pending confirmation clears on other navigation/actions
 - `main.optionNote` and `main.questionNote` open option/question notes; defaults: `n`, `Shift+N`
-- `1..9` is fixed and selects or toggles the matching option; on the review tab, `1`, `2`, and `3` trigger `Submit`, `Elaborate`, and `Cancel`
+- `1..9` is fixed and selects or toggles the matching option; on the review tab, `1`, `2`, and `3` select `Submit`, `Elaborate` (opens the optional note editor), and `Cancel`
 - when `Double-press review shortcuts` is enabled, review-tab `1`, `2`, and `3` require the same key twice without a timeout, and the review screen shows an inline hint for the pending action
 
 Editing flow:

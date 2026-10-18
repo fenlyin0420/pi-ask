@@ -22,6 +22,8 @@
 Review 页在 `Cancel` 之后多一行 `Optional note:`（方向键可达，回车打开 note 编辑器，
 复用 `noteEditor` 键位），可以留空；提交后作为 `details.note`（顶层，与每题的
 `answers[*].note` 区分）返回，并出现在 summary / transcript / elaboration 文本里。
+选择 `Elaborate` 同样打开这个编辑器，保存后才以 `elaborate` 模式结束（Esc 关闭
+则回到 review、`mode` 复位为 submit）。
 
 冲突面：`types.ts`、`constants/{text,ui}.ts`、`state/{view,navigation,transitions,editor,result}.ts`、
 `result-format.ts`、`ui/{render,render-submit,view-models/review,input,controller,dismiss-guard,auto-submit}.ts`。

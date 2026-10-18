@@ -39,7 +39,7 @@ export function saveEditorDraft(state: AskState, text: string): AskState {
 		return saveCustomAnswer(state, text);
 	}
 	if (state.view.kind === "note" || state.view.kind === "askNote") {
-		return saveNote(state, text);
+		return saveNote(state, text, false);
 	}
 	return state;
 }
@@ -49,7 +49,7 @@ export function submitEditorDraft(state: AskState, text: string): AskState {
 		return submitCustomAnswer(state, text);
 	}
 	if (state.view.kind === "note" || state.view.kind === "askNote") {
-		return saveNote(state, text);
+		return saveNote(state, text, true);
 	}
 	return state;
 }

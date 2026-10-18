@@ -173,8 +173,12 @@ export function submitCustomAnswer(
 	return saveInputValue(state, rawValue, true);
 }
 
-export function saveNote(state: AskState, rawValue: string): AskState {
-	return saveNoteValue(state, rawValue);
+export function saveNote(
+	state: AskState,
+	rawValue: string,
+	submit = false
+): AskState {
+	return saveNoteValue(state, rawValue, submit);
 }
 
 function completeSubmitAction(state: AskState): AskState {
@@ -185,7 +189,7 @@ function completeSubmitAction(state: AskState): AskState {
 		return { ...state, cancelled: true, completed: true };
 	}
 	if (state.activeSubmitActionIndex === 1) {
-		return { ...state, mode: "elaborate", completed: true };
+		return setView({ ...state, mode: "elaborate" }, askNoteView());
 	}
 	return { ...state, mode: "submit", completed: true };
 }
@@ -278,12 +282,18 @@ function saveInputValue(
 	return advanceToNextTab(nextState);
 }
 
-function saveNoteValue(state: AskState, rawValue: string): AskState {
+function saveNoteValue(
+	state: AskState,
+	rawValue: string,
+	submit = false
+): AskState {
 	if (state.view.kind === "askNote") {
-		return {
-			...exitEditingView(state),
-			note: rawValue.trim() ? rawValue : undefined,
-		};
+		const note = rawValue.trim() ? rawValue : undefined;
+		const nextState = { ...exitEditingView(state), note };
+		if (submit && state.mode === "elaborate") {
+			return { ...nextState, completed: true };
+		}
+		return { ...nextState, mode: "submit" };
 	}
 	if (state.view.kind !== "note") {
 		return exitEditingView(state);

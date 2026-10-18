@@ -192,3 +192,33 @@ test("review tab renders the optional note editor in place of the row text", () 
 
 	assert(lines.includes("❯ Optional note:"));
 });
+
+test("elaborate action opens the note editor and saving commits an elaborate result", () => {
+	let state = submitTabState();
+	state = moveOption(state, 1);
+	assert.equal(state.activeSubmitActionIndex, 1);
+	state = confirmCurrentSelection(state);
+
+	assert.deepEqual(state.view, { kind: "askNote" });
+	assert.equal(state.mode, "elaborate");
+	assert.equal(state.completed, false);
+
+	const done = saveNote(state, "please elaborate", true);
+	assert.equal(done.completed, true);
+	assert.equal(done.cancelled, false);
+	assert.equal(done.mode, "elaborate");
+	assert.equal(done.note, "please elaborate");
+});
+
+test("closing the elaborate note editor without saving returns to the review in submit mode", () => {
+	let state = submitTabState();
+	state = moveOption(state, 1);
+	state = confirmCurrentSelection(state);
+
+	const closed = saveNote(state, "draft thought");
+	assert.deepEqual(closed.view, { kind: "submit" });
+	assert.equal(closed.completed, false);
+	assert.equal(closed.cancelled, false);
+	assert.equal(closed.mode, "submit");
+	assert.equal(closed.note, "draft thought");
+});

@@ -1,6 +1,7 @@
 import type { AskConfig } from "../config/schema.ts";
 import { hasAnswerNotes } from "../state/answers.ts";
 import { isQuestionAnswered, isSubmitTab } from "../state/selectors.ts";
+import { isEditingView } from "../state/view.ts";
 import type { AskState } from "../types.ts";
 
 export function maybeAutoSubmitState(
@@ -22,6 +23,9 @@ export function shouldAutoSubmit(state: AskState, config: AskConfig): boolean {
 		return false;
 	}
 	if (state.completed || state.cancelled || !isSubmitTab(state)) {
+		return false;
+	}
+	if (isEditingView(state)) {
 		return false;
 	}
 	if (state.note) {
