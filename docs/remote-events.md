@@ -56,6 +56,7 @@ pi.events.emit("@eko24ive/pi-ask:submit", {
     answers: {
       questionId: { values: ["option-value"] },
     },
+    note: "optional whole-ask comment",
   },
 });
 ```
@@ -78,6 +79,7 @@ Rules:
 - labels and indices are recomputed by pi-ask
 - a remote `answer` replaces the current answer set; stale UI answers are not merged
 - `mode` defaults to `"submit"`; use `"elaborate"` to complete as an elaboration request
+- `note` is optional and lives at the response level, not inside `answers`; it becomes `details.note`, never counts as an answer, is dropped when blank, and must be a string when present
 
 ## Cancel
 

@@ -294,7 +294,7 @@ Channels:
 - `@eko24ive/pi-ask:submit`
 - `@eko24ive/pi-ask:submit-result`
 
-Remote submissions must be explicit `{ kind: "answer" }` or `{ kind: "cancel" }` responses. Remote answers use question ids and normalized option values from the started event. pi-ask validates ids and values, recomputes labels/indices, and does not infer approval semantics from labels.
+Remote submissions must be explicit `{ kind: "answer" }` or `{ kind: "cancel" }` responses. Remote answers use question ids and normalized option values from the started event. pi-ask validates ids and values, recomputes labels/indices, and does not infer approval semantics from labels. An `answer` response may also carry an optional top-level `note`, which becomes `details.note`; blank notes are dropped and a non-string note is rejected as `invalid_answer`.
 
 See [`remote-events.md`](remote-events.md) for payload shapes, examples, and a local smoke test.
 

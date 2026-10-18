@@ -14,6 +14,7 @@ import {
 	type RemoteAskSubmitResultEvent,
 } from "../src/remote-ask.ts";
 import { createInitialState } from "../src/state/create.ts";
+import { summarizeResult, toAskResult } from "../src/state/result.ts";
 import { runAskFlow } from "../src/ui/controller.ts";
 
 const UNKNOWN_APPROVE_VALUE_RE = /Unknown option value "approve"/;
@@ -74,6 +75,73 @@ test("remote answer response validates and serializes explicit option values", (
 		customText: undefined,
 		optionNotes: undefined,
 	});
+});
+
+test("remote answer response carries the optional whole-ask note", () => {
+	const state = createInitialState({
+		questions: [
+			{
+				id: "decision",
+				prompt: "Proceed?",
+				options: [{ value: "yes", label: "Yes" }],
+			},
+		],
+	});
+
+	const result = applyRemoteAskResponse(state, {
+		kind: "answer",
+		answers: { decision: { values: ["yes"] } },
+		note: "  also update the changelog  ",
+	});
+
+	assert.equal(result.ok, true);
+	assert.equal(result.state.note, "  also update the changelog  ");
+	assert.equal(
+		summarizeResult(toAskResult(result.state)),
+		"Q1: Yes\nOptional note:   also update the changelog  "
+	);
+});
+
+test("remote answer response drops a blank optional note", () => {
+	const state = createInitialState({
+		questions: [
+			{
+				id: "decision",
+				prompt: "Proceed?",
+				options: [{ value: "yes", label: "Yes" }],
+			},
+		],
+	});
+
+	const result = applyRemoteAskResponse(state, {
+		kind: "answer",
+		answers: { decision: { values: ["yes"] } },
+		note: "   ",
+	});
+
+	assert.equal(result.ok, true);
+	assert.equal(result.state.note, undefined);
+});
+
+test("remote answer response rejects a non-string optional note", () => {
+	const state = createInitialState({
+		questions: [
+			{
+				id: "decision",
+				prompt: "Proceed?",
+				options: [{ value: "yes", label: "Yes" }],
+			},
+		],
+	});
+
+	const result = applyRemoteAskResponse(state, {
+		kind: "answer",
+		answers: { decision: { values: ["yes"] } },
+		note: 42 as never,
+	});
+
+	assert.equal(result.ok, false);
+	assert.equal(result.ok === false && result.error, "invalid_answer");
 });
 
 test("remote answer response replaces stale UI answers", () => {

@@ -31,6 +31,7 @@ export type RemoteAskResponse =
 			answers: Record<string, RemoteAskAnswer>;
 			kind: "answer";
 			mode?: "submit" | "elaborate";
+			note?: string;
 	  }
 	| { kind: "cancel" };
 
@@ -251,6 +252,7 @@ export function applyRemoteAskResponse(
 		state: {
 			...state,
 			answers: validation.answers,
+			note: validation.note?.trim() ? validation.note : undefined,
 			activeTabIndex: state.questions.length,
 			activeSubmitActionIndex: response.mode === "elaborate" ? 1 : 0,
 			completed: true,
@@ -264,10 +266,17 @@ function validateAnswerResponse(
 	state: AskState,
 	response: Extract<RemoteAskResponse, { kind: "answer" }>
 ):
-	| { answers: Record<string, AskStateAnswer>; ok: true }
+	| {
+			answers: Record<string, AskStateAnswer>;
+			note?: string;
+			ok: true;
+	  }
 	| { error: "invalid_answer"; message: string; ok: false } {
 	if (!isPlainObject(response.answers)) {
 		return invalidAnswer("Answer response must include an answers object.");
+	}
+	if (response.note !== undefined && typeof response.note !== "string") {
+		return invalidAnswer("Optional answer note must be a string.");
 	}
 	if (
 		response.mode &&
@@ -292,7 +301,7 @@ function validateAnswerResponse(
 		answers[questionId] = normalized.answer;
 	}
 
-	return { ok: true, answers };
+	return { ok: true, answers, note: response.note };
 }
 
 function normalizeRemoteAnswer(
