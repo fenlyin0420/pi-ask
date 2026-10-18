@@ -1,6 +1,6 @@
 import {
+	ELABORATE_ACTION_INDEX,
 	SUBMIT_ACTION_COUNT,
-	SUBMIT_NOTE_ROW_INDEX,
 } from "../constants/text.ts";
 import type { AskAction, AskState } from "../types.ts";
 import {
@@ -182,14 +182,11 @@ export function saveNote(
 }
 
 function completeSubmitAction(state: AskState): AskState {
-	if (state.activeSubmitActionIndex === SUBMIT_NOTE_ROW_INDEX) {
-		return setView(state, askNoteView());
-	}
 	if (state.activeSubmitActionIndex === 2) {
 		return { ...state, cancelled: true, completed: true };
 	}
-	if (state.activeSubmitActionIndex === 1) {
-		return setView({ ...state, mode: "elaborate" }, askNoteView());
+	if (state.activeSubmitActionIndex === ELABORATE_ACTION_INDEX) {
+		return setView(state, askNoteView());
 	}
 	return { ...state, mode: "submit", completed: true };
 }
@@ -288,12 +285,11 @@ function saveNoteValue(
 	submit = false
 ): AskState {
 	if (state.view.kind === "askNote") {
-		const note = rawValue.trim() ? rawValue : undefined;
-		const nextState = { ...exitEditingView(state), note };
-		if (submit && state.mode === "elaborate") {
-			return { ...nextState, completed: true };
-		}
-		return { ...nextState, mode: "submit" };
+		const nextState = {
+			...exitEditingView(state),
+			note: rawValue.trim() ? rawValue : undefined,
+		};
+		return submit ? { ...nextState, completed: true } : nextState;
 	}
 	if (state.view.kind !== "note") {
 		return exitEditingView(state);

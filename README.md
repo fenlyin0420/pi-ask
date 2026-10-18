@@ -52,9 +52,8 @@ Once installed, this package gives the agent a native way to ask for clarificati
 - ✍️ Inline free-form `Type your own` answers
 - 📎 Native pi-style `@` file references inside answer and note editors
 - 📝 Question-level and option-level notes
-- 🗒️ Optional free-form note on the review tab, returned alongside the answers and allowed to stay empty
+- 🗒️ `Elaborate` on the review tab expands the same inline free-text editor as `Type your own`; the text is appended after the submitted answers
 - 👀 Review tab with `Submit`, `Elaborate`, and `Cancel`
-- 💬 Elaboration flow to capture note-based clarification before final submission
 - ⌨️ Context-aware customizable keymaps with aliases for main flow, editors, and settings
 - ⚙️ Ask settings with persisted behaviour, notifications, keymaps, and `/answer` extraction config
 - 🔔 Optional external notifications when an ask flow is waiting for input
@@ -73,14 +72,14 @@ Use pi-style `@` file path autocomplete inside free-form answers and note editor
 ![Native pi-style @ file references inside the ask flow](docs/media/feature-at-file-mentions.png)
 
 ### Option and question notes
-Attach clarification notes to a specific option (`n`) or add broader question-level context (`Shift+N`). The review tab also exposes one optional note for the whole ask; it can stay empty and is returned with the submitted result.
+Attach clarification notes to a specific option (`n`) or add broader question-level context (`Shift+N`).
 
 | Option notes | Question notes |
 |---|---|
 | ![Option note editor with note text for selected option](docs/media/feature-option-note.png) | ![Question-level note editor with saved note](docs/media/feature-question-note.png) |
 
 ### Review tab — Elaborate and Submit
-Ask the agent to elaborate on notes before finalizing choices, or review all answers before returning them to the agent.
+`Elaborate` expands an inline free-text row that behaves like `Type your own`: `Enter` submits the answers with the typed text appended, `Esc` keeps the draft. `Submit` returns the answers as they are.
 
 | Elaborate | Submit |
 |---|---|
@@ -114,8 +113,8 @@ Default contexts:
 
 - `global`: `dismiss` (`Ctrl+C`) and `settings` (`?`)
 - `main`: confirm/cancel/toggle, tab navigation, option navigation, and note shortcuts
-- `editor`: custom answer submit/close and empty-editor navigation
-- `noteEditor`: note save/close and empty-editor navigation
+- `editor`: custom answer and review-tab appended-text submit/close, plus empty-editor navigation
+- `noteEditor`: question/option note save/close and empty-editor navigation
 - `settingsModal`: close, next/previous setting, and toggle
 
 Fixed bindings:
@@ -123,8 +122,8 @@ Fixed bindings:
 | Key | Context | Effect |
 |---|---|---|
 | `1..9` | Options list | Select or toggle matching option |
-| `1` `2` `3` | Review tab | Trigger `Submit` / `Elaborate` / `Cancel` |
-| `↑` `↓` | Review tab | Move between `Submit`, `Elaborate`, `Cancel`, and the optional note row |
+| `1` `2` `3` | Review tab | Trigger `Submit` / `Elaborate` (opens the inline input) / `Cancel` |
+| `↑` `↓` | Review tab | Move between `Submit`, `Elaborate`, and `Cancel` |
 | `@` | Editors | File-reference affordance |
 | Arrow keys / `Tab` | Non-empty editor | Stay in editor for cursor movement |
 

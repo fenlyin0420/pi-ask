@@ -6,7 +6,10 @@ import { getAskConfigStore } from "../src/config/store.ts";
 import { createInitialState } from "../src/state/create.ts";
 import {
 	applyNumberShortcut,
+	confirmCurrentSelection,
 	enterQuestionNoteMode,
+	moveOption,
+	moveTab,
 } from "../src/state/transitions.ts";
 import { runAskFlow } from "../src/ui/controller.ts";
 import { getInputCommand } from "../src/ui/input.ts";
@@ -141,6 +144,29 @@ test("non-empty note editing mode keeps arrows and tab in editor", () => {
 	});
 	assert.deepEqual(getInputCommand(state, DEFAULT_ASK_CONFIG, "\t", "x"), {
 		kind: "delegateToEditor",
+	});
+});
+
+test("review-tab appended-text editor uses editor bindings", () => {
+	let state = createInitialState({
+		questions: [
+			{
+				id: "q1",
+				prompt: "Question?",
+				options: [{ value: "a", label: "A" }],
+			},
+		],
+	});
+	state = moveTab(state, 1);
+	state = moveOption(state, 1);
+	state = confirmCurrentSelection(state);
+
+	assert.deepEqual(state.view, { kind: "askNote" });
+	assert.deepEqual(getInputCommand(state, DEFAULT_ASK_CONFIG, "\r", ""), {
+		kind: "delegateToEditor",
+	});
+	assert.deepEqual(getInputCommand(state, DEFAULT_ASK_CONFIG, "\x1b", ""), {
+		kind: "editClose",
 	});
 });
 
@@ -320,6 +346,71 @@ test("custom editor submit key controls actual editor submission", async () => {
 
 	assert.equal(result.answers.q1?.customText, "x");
 	getAskConfigStore().setConfig(DEFAULT_ASK_CONFIG);
+});
+
+test("review-tab elaborate input appends text and submits end to end", async () => {
+	getAskConfigStore().setConfig({
+		...DEFAULT_ASK_CONFIG,
+		notifications: {
+			...DEFAULT_ASK_CONFIG.notifications,
+			enabled: false,
+		},
+	});
+	let component: { handleInput(data: string): void } | undefined;
+
+	try {
+		const resultPromise = runAskFlow(
+			{
+				cwd: process.cwd(),
+				mode: "tui",
+				ui: {
+					custom(callback: (...args: unknown[]) => unknown) {
+						return new Promise((resolve) => {
+							component = callback(
+								{
+									requestRender() {
+										// Rendering is not needed for this controller test.
+									},
+								},
+								plainTheme(),
+								{},
+								resolve
+							) as typeof component;
+						});
+					},
+				},
+			} as never,
+			{
+				questions: [
+					{
+						id: "q1",
+						prompt: "Question?",
+						options: [
+							{ value: "a", label: "A" },
+							{ value: "b", label: "B" },
+						],
+					},
+				],
+			}
+		);
+
+		await new Promise((resolve) => setImmediate(resolve));
+		assert(component);
+		component.handleInput("1");
+		component.handleInput("2");
+		component.handleInput("2");
+		for (const char of "also the CLI") {
+			component.handleInput(char);
+		}
+		component.handleInput("\r");
+		const result = await resultPromise;
+
+		assert.equal(result.mode, "submit");
+		assert.equal(result.note, "also the CLI");
+		assert.deepEqual(result.answers.q1?.values, ["a"]);
+	} finally {
+		getAskConfigStore().setConfig(DEFAULT_ASK_CONFIG);
+	}
 });
 
 function plainTheme() {

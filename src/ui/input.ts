@@ -42,10 +42,10 @@ export function getInputCommand(
 		return { kind: "showSettings" };
 	}
 
-	if (state.view.kind === "input") {
+	if (state.view.kind === "input" || state.view.kind === "askNote") {
 		return getAnswerEditorInputCommand(config, data, editingText);
 	}
-	if (state.view.kind === "note" || state.view.kind === "askNote") {
+	if (state.view.kind === "note") {
 		return getNoteEditorInputCommand(config, data, editingText);
 	}
 

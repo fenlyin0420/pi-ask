@@ -258,7 +258,7 @@ Arrays are aliases: any listed key triggers the same action.
 
 - `global`: active in the main ask flow and editors; duplicates with those contexts are invalid
 - `main`: question and review flow
-- `editor`: custom answer editor
+- `editor`: custom answer editor and the review-tab appended-text editor
 - `noteEditor`: question/option note editor
 - `settingsModal`: `/ask-settings` and `?` settings overlay
 

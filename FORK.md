@@ -17,17 +17,18 @@
 `submit`/`cancel`，收工；10 分钟无人应答则退回文本并结束流程（`PI_ASK_REMOTE_TIMEOUT_MS` 可覆盖），
 避免无人应答把 agent 的回合永久挂住。
 
-### `feat: optional note on the review tab`
+### `feat: append free text from the review tab`
 
-Review 页在 `Cancel` 之后多一行 `Optional note:`（方向键可达，回车打开 note 编辑器，
-复用 `noteEditor` 键位），可以留空；提交后作为 `details.note`（顶层，与每题的
-`answers[*].note` 区分）返回，并出现在 summary / transcript / elaboration 文本里。
-选择 `Elaborate` 同样打开这个编辑器，保存后才以 `elaborate` 模式结束（Esc 关闭
-则回到 review、`mode` 复位为 submit）。
+Review 页的 `Elaborate` 就地展开成和题目里 `Type your own` 一样的输入行（复用
+`editor` 键位：Enter 提交、Esc 存草稿），没有独立的 `Optional note:` 行。输入内容
+作为顶层 `details.note`（与每题的 `answers[*].note` 区分）返回，提交后按普通
+`submit` 结束：前面的答案原样保留，只在末尾追加一行 `User added: …`，不会重述成
+`User asked to elaborate on …`。`mode: "elaborate"` 只保留给远端（`remote-ask`）
+提交，本地 UI 不再产生。
 
 冲突面：`types.ts`、`constants/{text,ui}.ts`、`state/{view,navigation,transitions,editor,result}.ts`、
 `result-format.ts`、`ui/{render,render-submit,view-models/review,input,controller,dismiss-guard,auto-submit}.ts`。
-上游改动这些文件时优先手抄上游逻辑，再把这行注记接回去。
+上游改动这些文件时优先手抄上游逻辑，再把这行追加输入接回去。
 
 ## 本机安装方式
 

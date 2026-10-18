@@ -103,9 +103,7 @@ function formatQuestionNoteLine(
 }
 
 function formatAskNoteLine(note: string, mode: "summary" | "render"): string {
-	return mode === "summary"
-		? `Optional note: ${note}`
-		: `  optional note: ${note}`;
+	return mode === "summary" ? `User added: ${note}` : `  added: ${note}`;
 }
 
 export function formatElaborationLines(
@@ -150,7 +148,7 @@ export function formatElaborationLines(
 
 function appendAskNoteLine(lines: string[], note: string | undefined) {
 	if (note) {
-		lines.push(`User added an optional note: ${quote(note)}`);
+		lines.push(`User added: ${quote(note)}`);
 	}
 }
 

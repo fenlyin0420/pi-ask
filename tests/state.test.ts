@@ -496,7 +496,7 @@ test("submit can complete even when some questions are unanswered", () => {
 	assert.equal(state.mode, "submit");
 });
 
-test("submit tab opens the note editor in elaborate mode and completes on save", () => {
+test("submit tab opens the inline append editor and completes on save", () => {
 	let state = createInitialState(sampleParams());
 	state = moveTab(state, -1);
 	state = moveOption(state, 1);
@@ -506,12 +506,12 @@ test("submit tab opens the note editor in elaborate mode and completes on save",
 	assert.deepEqual(state.view, { kind: "askNote" });
 	assert.equal(state.completed, false);
 	assert.equal(state.cancelled, false);
-	assert.equal(state.mode, "elaborate");
+	assert.equal(state.mode, "submit");
 
 	state = saveNote(state, "add context", true);
 	assert.equal(state.completed, true);
 	assert.equal(state.cancelled, false);
-	assert.equal(state.mode, "elaborate");
+	assert.equal(state.mode, "submit");
 	assert.equal(state.note, "add context");
 });
 
@@ -895,7 +895,7 @@ test("submit tab number shortcuts trigger matching review actions", () => {
 	const elaborated = applyNumberShortcut(state, 2);
 	assert.equal(elaborated.completed, false);
 	assert.equal(elaborated.cancelled, false);
-	assert.equal(elaborated.mode, "elaborate");
+	assert.equal(elaborated.mode, "submit");
 	assert.deepEqual(elaborated.view, { kind: "askNote" });
 
 	const cancelled = applyNumberShortcut(state, 3);

@@ -194,7 +194,7 @@ function renderFooter(
 		return [];
 	}
 	let footer: string;
-	if (state.view.kind === "input") {
+	if (state.view.kind === "input" || state.view.kind === "askNote") {
 		footer = renderFooterText(config, "input");
 	} else if (state.view.kind === "note") {
 		footer = renderFooterText(config, "note");

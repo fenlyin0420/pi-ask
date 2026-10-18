@@ -232,11 +232,11 @@ function isNativeEditorSubmitEnabled(controller: AskFlowController): boolean {
 	if (controller.state.view.kind === "input") {
 		return controller.config.keymaps.editor.submit.includes("enter");
 	}
-	if (
-		controller.state.view.kind === "note" ||
-		controller.state.view.kind === "askNote"
-	) {
+	if (controller.state.view.kind === "note") {
 		return controller.config.keymaps.noteEditor.save.includes("enter");
+	}
+	if (controller.state.view.kind === "askNote") {
+		return controller.config.keymaps.editor.submit.includes("enter");
 	}
 	return true;
 }

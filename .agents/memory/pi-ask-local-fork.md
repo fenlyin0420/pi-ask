@@ -19,7 +19,7 @@ remote-pi 那边现成的 `extension_ui_bridge`（started/submit/submit-result/c
 
 - 源码：`/home/fenlyin/Documents/GitHub/pi-ask` —— 已按 `git-fork-upstream-sync` 技能建 fork
   （`origin` = `fenlyin0420/pi-ask` 唯一 push 目标；`upstream` = `eko24ive/pi-ask` 只读）。
-  `main` = 上游纯净镜像（`49482b7`，禁写）；`dev` = 定制线（2 个提交：`9fce333` 功能 + `854ef2d` 文档）。
+  `main` = 上游纯净镜像（`49482b7`，禁写）；`dev` = 定制线（提交清单见 `FORK.md`）。
   **没有构建步骤**，`package.json` 的 `pi.extensions` 直接指 `./src/index.ts`，Pi 用 jiti 加载 TS。
   `FORK.md`（`dev` 上）写清了定制内容、本机安装方式与同步上游的命令。
   **用户明确要求：不提 PR 给上游**（长期自用二次开发，按 fork 技能走）。
@@ -48,6 +48,19 @@ remote-pi 那边现成的 `extension_ui_bridge`（started/submit/submit-result/c
 - 升级姿势：`git fetch upstream` → 先 `git log main..upstream/main` 看差异 → `main` merge
   upstream 并 push → `dev` merge `main`（或单人时 rebase）。dev 只有两个提交，冲突面很小；
   没有 `npm i` 覆盖问题，也没有 dist 补丁。
+
+## review 页追加输入（2026-10-18）
+
+上游的 `Elaborate` 会进 `mode: "elaborate"` 并把每个答案重述成
+`User asked to elaborate on question … after current answer …`。用户要求「追加就单纯追加」：
+`dev` 上改成 review 页 `Elaborate` 就地展开成和 `Type your own` 一样的输入行（复用
+`editor` 键位），保存后按普通 `submit` 结束、答案原样保留，只在末尾追加一行
+`User added: …`（顶层 `details.note`）。本地 UI 不再产生 elaborate 模式，`elaborate`
+只剩 remote-ask 提交会触发。
+
+同步上游时注意：上游若改 review 页渲染（`render-submit.ts`、`view-models/review.ts`）
+或 elaborate 文本（`result-format.ts`、`state/result.ts`），先手抄上游逻辑再把这行内联
+追加输入和 `User added:` 追加行接回去，别让上游的 `Optional note` 行复活。
 
 ## 关联
 

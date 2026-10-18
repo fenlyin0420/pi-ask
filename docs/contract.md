@@ -171,7 +171,7 @@ This document defines the stable external behavior. It does not explain internal
 - `cancelled: true` means the user dismissed the flow, UI was unavailable, or the payload was invalid before UI opened
 - semantically invalid payloads that reach tool execution return `error.kind === "invalid_input"` with structured `issues` and a transcript-friendly `Invalid ask_user payload:` message; their rendered status is `Invalid tool payload`
 - payloads missing schema-required fields fail Pi's schema validation before tool execution and use Pi's standard tool-error result without structured `details`
-- `mode: "submit"` is normal completion; `mode: "elaborate"` means the user asked the agent to continue with follow-up clarification based on notes
+- `mode: "submit"` is normal completion; `mode: "elaborate"` means a remote client asked the agent to continue with follow-up clarification based on notes
 - unanswered questions without notes are omitted from `answers`; note-only entries remain in `answers` to carry their notes, but all non-cancelled submitted result text includes `<label>: (no answer)` in summary mode and `? <label>: (no answer)` in transcript rendering
 - in `mode: "elaborate"`, `answers` contains only committed answers; note-only entries move to `elaboration.items`
 - `continuation.strategy === "refine_only"` means the next ask should refine the current flow rather than restart it
@@ -190,7 +190,7 @@ This document defines the stable external behavior. It does not explain internal
 - on multi-select questions, toggling an empty custom row opens the free-form editor, while toggling a custom row with saved free-form text selects or deselects it without opening the editor or clearing the text
 - saving or clearing free-form text on a multi-select question does not clear other selected options
 - `note` stores a question-level note
-- `note` at the top level of `details` stores the optional whole-ask note from the review tab; it is omitted when empty and never counts as an answer
+- `note` at the top level of `details` stores free-form text appended on the review tab or supplied by a remote answer; it is emitted after the answer lines, omitted when empty, and never counts as an answer
 - `optionNotes` includes only notes for selected options
 - question notes may exist without a selected answer
 - `elaboration.items` includes all question notes and all option notes, even for unselected options
@@ -202,7 +202,7 @@ This document defines the stable external behavior. It does not explain internal
 - once prior answers narrow the branch, agents should bundle the next 2-3 related unresolved questions into one follow-up ask when possible, instead of using a long sequence of single-question asks
 - `elaboration` is only present when `mode === "elaborate"`
 - elaborate `content` text and transcript rendering describe each note directly using the full question prompt and option label, and include the current committed answer text when available, instead of a generic elaboration banner
-- selecting `Elaborate` opens the optional note editor first; saving it (possibly empty) commits an `elaborate` result whose `content` text and transcript rendering still include the committed answer text so the agent can elaborate on that answer directly
+- selecting `Elaborate` expands the same inline free-form editor used for `Type your own` answers; saving it (possibly empty) completes the ask in `mode: "submit"` with the typed text appended after the answer lines, and the committed answers stay unchanged
 
 ## Supported UX
 
@@ -213,12 +213,12 @@ This document defines the stable external behavior. It does not explain internal
 - inline free-form answers for all question types
 - native pi-style `@` file path autocomplete inside free-form answer and note editors
 - question notes via `Shift+N`
-- optional whole-ask note on the review tab, editable in place and allowed to stay empty
+- the review-tab `Elaborate` row expands into the same inline free-form editor as `Type your own`; saved text is appended to the submitted result and leaves the answers untouched
 - option notes via `n`
 - number-key quick selection
 - submit/elaborate/cancel review tab
 - on the review tab, `Submit` and `Cancel` preview notes only for answered questions
-- on the review tab, `Elaborate` preview expands to all question notes and all option notes, including notes on unselected options
+- on the review tab, the `Elaborate` row expands to all question notes and all option notes, including notes on unselected options, while the appended-text editor is open
 - transcript-friendly call and result rendering
 - `/answer` command to convert the latest completed assistant message into an `AskParams` form through a synthetic `ask_user` tool call and open the ask UI
 - `/answer` extraction may use an internal `freeform: true` option for open-ended questions with no explicit choices; these render as user-input-only questions with the label `Type your answer:`, no numbered option row, and no selection caret; this marker is not part of the public `ask_user` tool contract
@@ -240,19 +240,19 @@ Main flow:
 - `global.settings` opens ask settings; default: `?`
 - `global.dismiss` dismisses the active ask surface; default: `Ctrl+C`
 - `main.nextTab` / `main.previousTab` move between tabs; defaults: `Tab`/`Right`, `Shift+Tab`/`Left`
-- `main.nextOption` / `main.previousOption` move between options, review actions, and the optional note row on the review tab; defaults: `Down`, `Up`
-- on the review tab, the optional note row follows `Cancel` and opens the note editor on confirm; the `Elaborate` action opens the same editor and commits an elaborate result on save
+- `main.nextOption` / `main.previousOption` move between options or, on the review tab, review actions; defaults: `Down`, `Up`
+- on the review tab, `Elaborate` opens the inline appended-text editor on confirm
 - `main.confirm`, `main.cancel`, and `main.toggle` confirm, cancel, or toggle; defaults: `Enter`, `Esc`, `Space`
 - `main.changeQuestionType` changes the active question type (non-preview: `single <-> multi`; preview: `preview <-> multi`); default: `t`; destructive `multi -> single` changes require pressing the type hotkey again, with no timeout, and the pending confirmation clears on other navigation/actions
 - `main.optionNote` and `main.questionNote` open option/question notes; defaults: `n`, `Shift+N`
-- `1..9` is fixed and selects or toggles the matching option; on the review tab, `1`, `2`, and `3` select `Submit`, `Elaborate` (opens the optional note editor), and `Cancel`
+- `1..9` is fixed and selects or toggles the matching option; on the review tab, `1`, `2`, and `3` select `Submit`, `Elaborate` (opens the inline appended-text editor), and `Cancel`
 - when `Double-press review shortcuts` is enabled, review-tab `1`, `2`, and `3` require the same key twice without a timeout, and the review screen shows an inline hint for the pending action
 
 Editing flow:
 
 - `editor.submit` submits the current custom-answer editor input and closes the editor; default: `Enter`
-- `noteEditor.save` saves the current note editor and keeps the ask flow open; default: `Enter`
-- note editor bindings also apply to the review-tab optional note editor
+- `noteEditor.save` saves the current question/option note editor and keeps the ask flow open; default: `Enter`
+- the review-tab appended-text editor uses `editor` bindings, so `editor.submit` completes the ask with the typed text appended
 - `editor.close` / `noteEditor.close` save draft and close the editor; default: `Esc`
 - `global.dismiss` dismisses the entire flow immediately without saving the current editor draft when no dirty-dismiss confirmation is pending
 - `global.settings` opens ask settings when the editor is empty; otherwise the key is delegated to the editor as text/input

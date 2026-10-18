@@ -20,8 +20,4 @@ export const UI_TEXT = {
 	unanswered: "→ unanswered",
 	editorPlaceholderInput: "Type answer...",
 	editorPlaceholderNote: "Add a note...",
-	editorPlaceholderOptionalNote: "Add anything else (optional)...",
-	optionalNoteTitle: "Optional note:",
-	optionalNoteHint: "optional — press Enter to type",
-	optionalNoteIdle: "optional, can be empty",
 } as const;

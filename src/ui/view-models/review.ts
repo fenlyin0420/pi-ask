@@ -1,5 +1,5 @@
 import { visibleWidth } from "@earendil-works/pi-tui";
-import { SUBMIT_CHOICES, SUBMIT_NOTE_ROW_INDEX } from "../../constants/text.ts";
+import { SUBMIT_CHOICES } from "../../constants/text.ts";
 import { UI_DIMENSIONS } from "../../constants/ui.ts";
 import { isCustomOnlyAnswer } from "../../state/answers.ts";
 import {
@@ -24,17 +24,16 @@ export interface ReviewQuestionModel {
 	unanswered: boolean;
 }
 
-export interface ReviewNoteRowModel {
+export interface ReviewElaborateModel {
 	editing: boolean;
-	focused: boolean;
 	text?: string;
 }
 
 export interface ReviewScreenModel {
 	actionColumnWidth: number;
 	actions: Array<{ label: string; selected: boolean }>;
+	elaborate: ReviewElaborateModel;
 	layout: "stacked" | "wide";
-	note: ReviewNoteRowModel;
 	questions: ReviewQuestionModel[];
 }
 
@@ -43,6 +42,8 @@ export function buildReviewScreenModel(
 	width: number
 ): ReviewScreenModel {
 	const showAllNotes = state.activeSubmitActionIndex === 1;
+	const editingElaborate = state.view.kind === "askNote";
+	const elaborateText = state.note;
 	const actionColumnWidth = getSubmitActionColumnWidth();
 	return {
 		actionColumnWidth,
@@ -50,14 +51,13 @@ export function buildReviewScreenModel(
 			label,
 			selected: index === state.activeSubmitActionIndex,
 		})),
-		layout: shouldUseWideSubmitLayout(width, actionColumnWidth)
-			? "wide"
-			: "stacked",
-		note: {
-			editing: state.view.kind === "askNote",
-			focused: state.activeSubmitActionIndex === SUBMIT_NOTE_ROW_INDEX,
-			text: state.note,
-		},
+		elaborate: { editing: editingElaborate, text: elaborateText },
+		layout: getReviewLayout({
+			editingElaborate,
+			hasElaborateText: Boolean(elaborateText),
+			width,
+			actionColumnWidth,
+		}),
 		questions: state.questions.map((question) =>
 			toReviewQuestionModel(
 				question.label,
@@ -91,6 +91,20 @@ function toReviewQuestionModel(
 			: undefined,
 		unanswered: false,
 	};
+}
+
+function getReviewLayout(args: {
+	actionColumnWidth: number;
+	editingElaborate: boolean;
+	hasElaborateText: boolean;
+	width: number;
+}): "stacked" | "wide" {
+	if (args.editingElaborate || args.hasElaborateText) {
+		return "stacked";
+	}
+	return shouldUseWideSubmitLayout(args.width, args.actionColumnWidth)
+		? "wide"
+		: "stacked";
 }
 
 function getSubmitActionColumnWidth(): number {

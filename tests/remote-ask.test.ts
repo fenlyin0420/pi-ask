@@ -98,7 +98,7 @@ test("remote answer response carries the optional whole-ask note", () => {
 	assert.equal(result.state.note, "  also update the changelog  ");
 	assert.equal(
 		summarizeResult(toAskResult(result.state)),
-		"Q1: Yes\nOptional note:   also update the changelog  "
+		"Q1: Yes\nUser added:   also update the changelog  "
 	);
 });
 

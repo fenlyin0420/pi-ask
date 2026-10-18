@@ -1,8 +1,5 @@
-import {
-	type Editor,
-	truncateToWidth,
-	wrapTextWithAnsi,
-} from "@earendil-works/pi-tui";
+import { type Editor, truncateToWidth } from "@earendil-works/pi-tui";
+import { ELABORATE_ACTION_INDEX } from "../constants/text.ts";
 import { UI_DIMENSIONS, UI_TEXT } from "../constants/ui.ts";
 import type { AskState } from "../types.ts";
 import {
@@ -14,7 +11,7 @@ import {
 import type { Theme } from "./render-types.ts";
 import {
 	buildReviewScreenModel,
-	type ReviewNoteRowModel,
+	type ReviewElaborateModel,
 } from "./view-models/review.ts";
 
 export function renderSubmitScreen(
@@ -32,7 +29,8 @@ export function renderSubmitScreen(
 		const actionLines = renderSubmitActions(
 			model,
 			theme,
-			model.actionColumnWidth
+			model.actionColumnWidth,
+			editor
 		);
 		for (const line of mergeColumns(
 			actionLines,
@@ -42,19 +40,15 @@ export function renderSubmitScreen(
 		)) {
 			lines.push(line);
 		}
-		lines.push("");
-		appendOptionalNote(lines, model.note, theme, width, editor);
 		appendReviewShortcutHint(lines, reviewShortcutHint, theme, width);
 		return;
 	}
 
 	const reviewLines = renderSubmitReviewLines(model, theme, width);
-	const actionLines = renderSubmitActions(model, theme, width);
+	const actionLines = renderSubmitActions(model, theme, width, editor);
 	lines.push(...reviewLines);
 	lines.push("");
 	lines.push(...actionLines);
-	lines.push("");
-	appendOptionalNote(lines, model.note, theme, width, editor);
 	appendReviewShortcutHint(lines, reviewShortcutHint, theme, width);
 }
 
@@ -149,7 +143,8 @@ function renderReviewQuestion(
 function renderSubmitActions(
 	model: ReturnType<typeof buildReviewScreenModel>,
 	theme: Theme,
-	width: number
+	width: number,
+	editor?: Editor
 ): string[] {
 	const lines: string[] = [];
 	for (const [index, action] of model.actions.entries()) {
@@ -163,57 +158,50 @@ function renderSubmitActions(
 			prefix,
 			prefix
 		);
+		if (index === ELABORATE_ACTION_INDEX) {
+			renderElaborateInput(lines, model.elaborate, theme, width, editor);
+		}
 	}
 	return lines;
 }
 
-function appendOptionalNote(
+function renderElaborateInput(
 	lines: string[],
-	note: ReviewNoteRowModel,
+	elaborate: ReviewElaborateModel,
 	theme: Theme,
 	width: number,
 	editor: Editor | undefined
 ) {
-	const pointer = note.focused ? "❯ " : "  ";
-	if (note.editing && editor) {
-		lines.push(
-			truncateToWidth(
-				`${pointer}${theme.fg("accent", UI_TEXT.optionalNoteTitle)}`,
-				width
-			)
-		);
+	if (elaborate.editing && editor) {
+		const indent = "     ";
 		renderEditorBlock({
 			lines,
 			editorLines: editor.render(
 				Math.max(
 					UI_DIMENSIONS.editorMinWidth,
-					width - UI_DIMENSIONS.editorContentPadding
+					width - UI_DIMENSIONS.editorIndentedPadding
 				)
 			),
 			width,
 			theme,
-			indent: "  ",
-			availableWidth: width - 2,
-			placeholder: UI_TEXT.editorPlaceholderOptionalNote,
+			indent,
+			availableWidth: width - indent.length,
+			placeholder: UI_TEXT.editorPlaceholderInput,
 			isEmpty: editor.getText().length === 0,
 		});
 		return;
 	}
-
-	const text = `${theme.fg("accent", UI_TEXT.optionalNoteTitle)}${theme.fg(
-		note.text ? "text" : "muted",
-		` ${note.text ?? emptyNoteText(note)}`
-	)}`;
-	const wrapped = wrapTextWithAnsi(text, Math.max(1, width - 2));
-	for (const [index, line] of wrapped.entries()) {
-		lines.push(
-			truncateToWidth(`${index === 0 ? pointer : "  "}${line}`, width)
+	if (elaborate.text) {
+		pushWrappedText(
+			lines,
+			elaborate.text,
+			width,
+			theme,
+			"muted",
+			"     ",
+			"     "
 		);
 	}
-}
-
-function emptyNoteText(note: ReviewNoteRowModel): string {
-	return note.focused ? UI_TEXT.optionalNoteHint : UI_TEXT.optionalNoteIdle;
 }
 
 function appendReviewShortcutHint(
