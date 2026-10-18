@@ -1,3 +1,4 @@
+import { SUBMIT_ROW_COUNT } from "../constants/text.ts";
 import { clamp } from "../math.ts";
 import type { AskState } from "../types.ts";
 import {
@@ -6,8 +7,6 @@ import {
 	isSubmitTab,
 } from "./selectors.ts";
 import { isEditingView, navigateView, submitView } from "./view.ts";
-
-const SUBMIT_ACTION_COUNT = 3;
 
 export function createInitialState(params: {
 	title?: string;
@@ -50,7 +49,7 @@ export function moveOption(state: AskState, delta: number): AskState {
 			activeSubmitActionIndex: clamp(
 				state.activeSubmitActionIndex + normalizedDelta,
 				0,
-				SUBMIT_ACTION_COUNT - 1
+				SUBMIT_ROW_COUNT - 1
 			),
 		};
 	}

@@ -1,3 +1,7 @@
+import {
+	SUBMIT_ACTION_COUNT,
+	SUBMIT_NOTE_ROW_INDEX,
+} from "../constants/text.ts";
 import type { AskAction, AskState } from "../types.ts";
 import {
 	emptyAnswer,
@@ -26,14 +30,13 @@ import {
 	isSubmitTab,
 } from "./selectors.ts";
 import {
+	askNoteView,
 	inputView,
 	navigateView,
 	optionNoteView,
 	questionNoteView,
 	submitView,
 } from "./view.ts";
-
-const SUBMIT_ACTION_COUNT = 3;
 
 export function createInitialState(params: {
 	title?: string;
@@ -66,6 +69,8 @@ export function reduceAskState(state: AskState, action: AskAction): AskState {
 			return moveOptionBase(state, action.delta);
 		case "OPEN_INPUT":
 			return setView(state, inputView(action.questionId));
+		case "OPEN_ASK_NOTE":
+			return setView(state, askNoteView());
 		case "OPEN_QUESTION_NOTE":
 			return setView(state, questionNoteView(action.questionId));
 		case "OPEN_OPTION_NOTE":
@@ -92,6 +97,10 @@ export function reduceAskState(state: AskState, action: AskAction): AskState {
 
 export function enterInputMode(state: AskState, questionId: string): AskState {
 	return reduceAskState(state, { type: "OPEN_INPUT", questionId });
+}
+
+export function enterAskNoteMode(state: AskState): AskState {
+	return reduceAskState(state, { type: "OPEN_ASK_NOTE" });
 }
 
 export function enterQuestionNoteMode(
@@ -169,6 +178,9 @@ export function saveNote(state: AskState, rawValue: string): AskState {
 }
 
 function completeSubmitAction(state: AskState): AskState {
+	if (state.activeSubmitActionIndex === SUBMIT_NOTE_ROW_INDEX) {
+		return setView(state, askNoteView());
+	}
 	if (state.activeSubmitActionIndex === 2) {
 		return { ...state, cancelled: true, completed: true };
 	}
@@ -267,6 +279,12 @@ function saveInputValue(
 }
 
 function saveNoteValue(state: AskState, rawValue: string): AskState {
+	if (state.view.kind === "askNote") {
+		return {
+			...exitEditingView(state),
+			note: rawValue.trim() ? rawValue : undefined,
+		};
+	}
 	if (state.view.kind !== "note") {
 		return exitEditingView(state);
 	}

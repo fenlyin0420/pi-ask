@@ -128,6 +128,7 @@ export interface AskResult {
 	elaboration?: AskElaborationPayload;
 	error?: AskValidationError;
 	mode: "submit" | "elaborate";
+	note?: string;
 	questions: AskQuestionSummary[];
 	title?: string;
 }
@@ -136,7 +137,8 @@ export type ViewState =
 	| { kind: "navigate" }
 	| { kind: "submit" }
 	| { kind: "input"; questionId: string }
-	| { kind: "note"; questionId: string; optionValue?: string };
+	| { kind: "note"; questionId: string; optionValue?: string }
+	| { kind: "askNote" };
 
 export interface AskState {
 	activeOptionIndex: number;
@@ -146,6 +148,7 @@ export interface AskState {
 	cancelled: boolean;
 	completed: boolean;
 	mode: "submit" | "elaborate";
+	note?: string;
 	questions: AskQuestion[];
 	title?: string;
 	view: ViewState;
@@ -160,6 +163,7 @@ export type AskAction =
 	| { type: "MOVE_TAB"; delta: 1 | -1 }
 	| { type: "MOVE_OPTION"; delta: 1 | -1 }
 	| { type: "OPEN_INPUT"; questionId: string }
+	| { type: "OPEN_ASK_NOTE" }
 	| { type: "OPEN_QUESTION_NOTE"; questionId: string }
 	| { type: "OPEN_OPTION_NOTE"; questionId: string; optionValue: string }
 	| { type: "CONFIRM" }

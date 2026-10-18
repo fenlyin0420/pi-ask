@@ -60,6 +60,7 @@ This document defines the stable external behavior. It does not explain internal
       }>;
     };
     mode: "submit" | "elaborate";
+    note?: string;
     questions: Array<{
       id: string;
       label: string;
@@ -189,6 +190,7 @@ This document defines the stable external behavior. It does not explain internal
 - on multi-select questions, toggling an empty custom row opens the free-form editor, while toggling a custom row with saved free-form text selects or deselects it without opening the editor or clearing the text
 - saving or clearing free-form text on a multi-select question does not clear other selected options
 - `note` stores a question-level note
+- `note` at the top level of `details` stores the optional whole-ask note from the review tab; it is omitted when empty and never counts as an answer
 - `optionNotes` includes only notes for selected options
 - question notes may exist without a selected answer
 - `elaboration.items` includes all question notes and all option notes, even for unselected options
@@ -211,6 +213,7 @@ This document defines the stable external behavior. It does not explain internal
 - inline free-form answers for all question types
 - native pi-style `@` file path autocomplete inside free-form answer and note editors
 - question notes via `Shift+N`
+- optional whole-ask note on the review tab, editable in place and allowed to stay empty
 - option notes via `n`
 - number-key quick selection
 - submit/elaborate/cancel review tab
@@ -237,7 +240,8 @@ Main flow:
 - `global.settings` opens ask settings; default: `?`
 - `global.dismiss` dismisses the active ask surface; default: `Ctrl+C`
 - `main.nextTab` / `main.previousTab` move between tabs; defaults: `Tab`/`Right`, `Shift+Tab`/`Left`
-- `main.nextOption` / `main.previousOption` move between options or review actions; defaults: `Down`, `Up`
+- `main.nextOption` / `main.previousOption` move between options, review actions, and the optional note row on the review tab; defaults: `Down`, `Up`
+- on the review tab, the optional note row follows `Cancel` and opens the note editor on confirm
 - `main.confirm`, `main.cancel`, and `main.toggle` confirm, cancel, or toggle; defaults: `Enter`, `Esc`, `Space`
 - `main.changeQuestionType` changes the active question type (non-preview: `single <-> multi`; preview: `preview <-> multi`); default: `t`; destructive `multi -> single` changes require pressing the type hotkey again, with no timeout, and the pending confirmation clears on other navigation/actions
 - `main.optionNote` and `main.questionNote` open option/question notes; defaults: `n`, `Shift+N`
@@ -248,6 +252,7 @@ Editing flow:
 
 - `editor.submit` submits the current custom-answer editor input and closes the editor; default: `Enter`
 - `noteEditor.save` saves the current note editor and keeps the ask flow open; default: `Enter`
+- note editor bindings also apply to the review-tab optional note editor
 - `editor.close` / `noteEditor.close` save draft and close the editor; default: `Esc`
 - `global.dismiss` dismisses the entire flow immediately without saving the current editor draft when no dirty-dismiss confirmation is pending
 - `global.settings` opens ask settings when the editor is empty; otherwise the key is delegated to the editor as text/input

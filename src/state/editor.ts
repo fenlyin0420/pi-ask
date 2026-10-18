@@ -19,6 +19,9 @@ export function getEditorDraft(state: AskState): string {
 	if (state.view.kind === "input") {
 		return getAnswer(state, state.view.questionId)?.customText ?? "";
 	}
+	if (state.view.kind === "askNote") {
+		return state.note ?? "";
+	}
 	if (state.view.kind === "note") {
 		if (state.view.optionValue) {
 			return (
@@ -35,7 +38,7 @@ export function saveEditorDraft(state: AskState, text: string): AskState {
 	if (state.view.kind === "input") {
 		return saveCustomAnswer(state, text);
 	}
-	if (state.view.kind === "note") {
+	if (state.view.kind === "note" || state.view.kind === "askNote") {
 		return saveNote(state, text);
 	}
 	return state;
@@ -45,7 +48,7 @@ export function submitEditorDraft(state: AskState, text: string): AskState {
 	if (state.view.kind === "input") {
 		return submitCustomAnswer(state, text);
 	}
-	if (state.view.kind === "note") {
+	if (state.view.kind === "note" || state.view.kind === "askNote") {
 		return saveNote(state, text);
 	}
 	return state;

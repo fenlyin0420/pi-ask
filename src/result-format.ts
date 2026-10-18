@@ -42,6 +42,10 @@ export function formatResultLines(
 		lines.push(formatPresentationNoteLine(options.mode));
 	}
 
+	if (result.note) {
+		lines.push(formatAskNoteLine(result.note, options.mode));
+	}
+
 	return lines;
 }
 
@@ -98,6 +102,12 @@ function formatQuestionNoteLine(
 		: `  note: ${note}`;
 }
 
+function formatAskNoteLine(note: string, mode: "summary" | "render"): string {
+	return mode === "summary"
+		? `Optional note: ${note}`
+		: `  optional note: ${note}`;
+}
+
 export function formatElaborationLines(
 	result: AskResult,
 	_options: { mode: "summary" | "render" }
@@ -115,6 +125,7 @@ export function formatElaborationLines(
 	});
 
 	if (lines.length > 0) {
+		appendAskNoteLine(lines, result.note);
 		return lines;
 	}
 
@@ -127,7 +138,20 @@ export function formatElaborationLines(
 		})
 		.filter((line): line is string => Boolean(line));
 
-	return answerLines.length > 0 ? answerLines : [ELABORATED_SUMMARY];
+	if (answerLines.length > 0) {
+		appendAskNoteLine(answerLines, result.note);
+		return answerLines;
+	}
+
+	const fallbackLines = [ELABORATED_SUMMARY];
+	appendAskNoteLine(fallbackLines, result.note);
+	return fallbackLines;
+}
+
+function appendAskNoteLine(lines: string[], note: string | undefined) {
+	if (note) {
+		lines.push(`User added an optional note: ${quote(note)}`);
+	}
 }
 
 function formatElaborationAnswerContext(

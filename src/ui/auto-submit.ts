@@ -24,6 +24,9 @@ export function shouldAutoSubmit(state: AskState, config: AskConfig): boolean {
 	if (state.completed || state.cancelled || !isSubmitTab(state)) {
 		return false;
 	}
+	if (state.note) {
+		return false;
+	}
 	for (const question of state.questions) {
 		if (!isQuestionAnswered(state, question.id)) {
 			return false;

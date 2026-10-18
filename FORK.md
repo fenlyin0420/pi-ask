@@ -2,11 +2,12 @@
 
 - `origin` = 本 fork（唯一 push 目标），`upstream` = `eko24ive/pi-ask`（只读，不提 PR）。
 - `main` 是上游纯净镜像，**不要在它上面写任何东西**；所有定制只在 `dev`。
-- 目前 `dev` 只有**一个**提交，改动尽量收在新增文件里，减少与上游的重叠面。
+- 改动尽量收在新增文件里，减少与上游的重叠面；无法避免时在下面记清触及的文件。
 
 ## `dev` 上有什么
 
-`feat: answer ask_user headlessly on non-terminal hosts` —
+### `feat: answer ask_user headlessly on non-terminal hosts`
+
 新增 `src/remote-headless.ts`，另有 `ask-tool.ts` / `ask-tool-helpers.ts` /
 `constants/text.ts` / `ui/controller.ts` 四处小改。
 
@@ -15,6 +16,16 @@
 现在非 TUI 且有 remote runtime 时改走 pi-ask 自己的事件契约：发 `started`，等一次
 `submit`/`cancel`，收工；10 分钟无人应答则退回文本并结束流程（`PI_ASK_REMOTE_TIMEOUT_MS` 可覆盖），
 避免无人应答把 agent 的回合永久挂住。
+
+### `feat: optional note on the review tab`
+
+Review 页在 `Cancel` 之后多一行 `Optional note:`（方向键可达，回车打开 note 编辑器，
+复用 `noteEditor` 键位），可以留空；提交后作为 `details.note`（顶层，与每题的
+`answers[*].note` 区分）返回，并出现在 summary / transcript / elaboration 文本里。
+
+冲突面：`types.ts`、`constants/{text,ui}.ts`、`state/{view,navigation,transitions,editor,result}.ts`、
+`result-format.ts`、`ui/{render,render-submit,view-models/review,input,controller,dismiss-guard,auto-submit}.ts`。
+上游改动这些文件时优先手抄上游逻辑，再把这行注记接回去。
 
 ## 本机安装方式
 

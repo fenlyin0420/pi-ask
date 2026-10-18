@@ -1,5 +1,5 @@
 import { visibleWidth } from "@earendil-works/pi-tui";
-import { SUBMIT_CHOICES } from "../../constants/text.ts";
+import { SUBMIT_CHOICES, SUBMIT_NOTE_ROW_INDEX } from "../../constants/text.ts";
 import { UI_DIMENSIONS } from "../../constants/ui.ts";
 import { isCustomOnlyAnswer } from "../../state/answers.ts";
 import {
@@ -24,10 +24,17 @@ export interface ReviewQuestionModel {
 	unanswered: boolean;
 }
 
+export interface ReviewNoteRowModel {
+	editing: boolean;
+	focused: boolean;
+	text?: string;
+}
+
 export interface ReviewScreenModel {
 	actionColumnWidth: number;
 	actions: Array<{ label: string; selected: boolean }>;
 	layout: "stacked" | "wide";
+	note: ReviewNoteRowModel;
 	questions: ReviewQuestionModel[];
 }
 
@@ -46,6 +53,11 @@ export function buildReviewScreenModel(
 		layout: shouldUseWideSubmitLayout(width, actionColumnWidth)
 			? "wide"
 			: "stacked",
+		note: {
+			editing: state.view.kind === "askNote",
+			focused: state.activeSubmitActionIndex === SUBMIT_NOTE_ROW_INDEX,
+			text: state.note,
+		},
 		questions: state.questions.map((question) =>
 			toReviewQuestionModel(
 				question.label,

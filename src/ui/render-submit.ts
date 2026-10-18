@@ -1,20 +1,29 @@
-import { truncateToWidth } from "@earendil-works/pi-tui";
-import { UI_TEXT } from "../constants/ui.ts";
+import {
+	type Editor,
+	truncateToWidth,
+	wrapTextWithAnsi,
+} from "@earendil-works/pi-tui";
+import { UI_DIMENSIONS, UI_TEXT } from "../constants/ui.ts";
 import type { AskState } from "../types.ts";
 import {
 	mergeColumns,
 	pushSavedNote,
 	pushWrappedText,
+	renderEditorBlock,
 } from "./render-helpers.ts";
 import type { Theme } from "./render-types.ts";
-import { buildReviewScreenModel } from "./view-models/review.ts";
+import {
+	buildReviewScreenModel,
+	type ReviewNoteRowModel,
+} from "./view-models/review.ts";
 
 export function renderSubmitScreen(
 	lines: string[],
 	state: AskState,
 	theme: Theme,
 	width: number,
-	reviewShortcutHint?: string
+	reviewShortcutHint?: string,
+	editor?: Editor
 ) {
 	const model = buildReviewScreenModel(state, width);
 	if (model.layout === "wide") {
@@ -33,6 +42,8 @@ export function renderSubmitScreen(
 		)) {
 			lines.push(line);
 		}
+		lines.push("");
+		appendOptionalNote(lines, model.note, theme, width, editor);
 		appendReviewShortcutHint(lines, reviewShortcutHint, theme, width);
 		return;
 	}
@@ -42,6 +53,8 @@ export function renderSubmitScreen(
 	lines.push(...reviewLines);
 	lines.push("");
 	lines.push(...actionLines);
+	lines.push("");
+	appendOptionalNote(lines, model.note, theme, width, editor);
 	appendReviewShortcutHint(lines, reviewShortcutHint, theme, width);
 }
 
@@ -152,6 +165,55 @@ function renderSubmitActions(
 		);
 	}
 	return lines;
+}
+
+function appendOptionalNote(
+	lines: string[],
+	note: ReviewNoteRowModel,
+	theme: Theme,
+	width: number,
+	editor: Editor | undefined
+) {
+	const pointer = note.focused ? "❯ " : "  ";
+	if (note.editing && editor) {
+		lines.push(
+			truncateToWidth(
+				`${pointer}${theme.fg("accent", UI_TEXT.optionalNoteTitle)}`,
+				width
+			)
+		);
+		renderEditorBlock({
+			lines,
+			editorLines: editor.render(
+				Math.max(
+					UI_DIMENSIONS.editorMinWidth,
+					width - UI_DIMENSIONS.editorContentPadding
+				)
+			),
+			width,
+			theme,
+			indent: "  ",
+			availableWidth: width - 2,
+			placeholder: UI_TEXT.editorPlaceholderOptionalNote,
+			isEmpty: editor.getText().length === 0,
+		});
+		return;
+	}
+
+	const text = `${theme.fg("accent", UI_TEXT.optionalNoteTitle)}${theme.fg(
+		note.text ? "text" : "muted",
+		` ${note.text ?? emptyNoteText(note)}`
+	)}`;
+	const wrapped = wrapTextWithAnsi(text, Math.max(1, width - 2));
+	for (const [index, line] of wrapped.entries()) {
+		lines.push(
+			truncateToWidth(`${index === 0 ? pointer : "  "}${line}`, width)
+		);
+	}
+}
+
+function emptyNoteText(note: ReviewNoteRowModel): string {
+	return note.focused ? UI_TEXT.optionalNoteHint : UI_TEXT.optionalNoteIdle;
 }
 
 function appendReviewShortcutHint(

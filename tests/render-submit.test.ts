@@ -76,6 +76,8 @@ test("submit screen keeps review and actions grouped side by side on wide screen
 		"  2. Elaborate  ",
 		"  3. Cancel      Color",
 		"                   → unanswered",
+		"",
+		"  Optional note: optional, can be empty",
 	]);
 });
 
@@ -108,6 +110,8 @@ test("submit screen stacks review above actions on narrow screens", () => {
 		"❯ 1. Submit",
 		"  2. Elaborate",
 		"  3. Cancel",
+		"",
+		"  Optional note: optional, can be empty",
 	]);
 });
 

@@ -50,6 +50,7 @@ export function toAskResult(state: AskState): AskResult {
 		title: state.title,
 		cancelled: state.cancelled,
 		mode: state.mode,
+		...(state.note ? { note: state.note } : {}),
 		questions: state.questions.map((question) => ({
 			id: question.id,
 			label: question.label,

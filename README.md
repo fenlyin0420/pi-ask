@@ -52,6 +52,7 @@ Once installed, this package gives the agent a native way to ask for clarificati
 - ✍️ Inline free-form `Type your own` answers
 - 📎 Native pi-style `@` file references inside answer and note editors
 - 📝 Question-level and option-level notes
+- 🗒️ Optional free-form note on the review tab, returned alongside the answers and allowed to stay empty
 - 👀 Review tab with `Submit`, `Elaborate`, and `Cancel`
 - 💬 Elaboration flow to capture note-based clarification before final submission
 - ⌨️ Context-aware customizable keymaps with aliases for main flow, editors, and settings
@@ -72,7 +73,7 @@ Use pi-style `@` file path autocomplete inside free-form answers and note editor
 ![Native pi-style @ file references inside the ask flow](docs/media/feature-at-file-mentions.png)
 
 ### Option and question notes
-Attach clarification notes to a specific option (`n`) or add broader question-level context (`Shift+N`).
+Attach clarification notes to a specific option (`n`) or add broader question-level context (`Shift+N`). The review tab also exposes one optional note for the whole ask; it can stay empty and is returned with the submitted result.
 
 | Option notes | Question notes |
 |---|---|
@@ -123,6 +124,7 @@ Fixed bindings:
 |---|---|---|
 | `1..9` | Options list | Select or toggle matching option |
 | `1` `2` `3` | Review tab | Trigger `Submit` / `Elaborate` / `Cancel` |
+| `↑` `↓` | Review tab | Move between `Submit`, `Elaborate`, `Cancel`, and the optional note row |
 | `@` | Editors | File-reference affordance |
 | Arrow keys / `Tab` | Non-empty editor | Stay in editor for cursor movement |
 
