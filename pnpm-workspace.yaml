@@ -1,0 +1,12 @@
+# pnpm 12 reads these settings here instead of package.json's `pnpm` field.
+overrides:
+  '@earendil-works/pi-agent-core': 0.84.1
+  '@earendil-works/pi-ai': 0.84.1
+  '@earendil-works/pi-tui': 0.84.1
+  '@earendil-works/pi-coding-agent': 0.84.1
+
+# Build scripts stay disabled; none of these need to run at install time.
+allowBuilds:
+  '@google/genai': false
+  lefthook: false
+  protobufjs: false

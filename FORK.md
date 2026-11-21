@@ -62,14 +62,17 @@ git checkout dev && git merge main && git push origin dev
 ## 验证
 
 ```bash
-npm test                          # node --test，209 个用例
-npx tsc -p tsconfig.json          # 类型检查
-npx ultracite check               # lint/format
+pnpm install                      # devDependencies 只在 pnpm 下安装
+pnpm test                         # node --test，209 个用例
+pnpm exec tsc -p tsconfig.json    # 类型检查
+pnpm check                        # lint/format（ultracite）
 ```
 
-devDependencies 不随仓库分发，需要跑上面三条时先装一次：
+**只用 pnpm，不要用 `npm install`**：npm 会写 `package-lock.json` 并铺出扁平
+`node_modules`，pnpm 12 的 `verify-deps-before-run` 检测到 node_modules 不是自己装的，
+之后任何 `pnpm exec`（含 `commit-msg` 钩子里的 commitlint）都会直接报
+`ERR_PNPM_VERIFY_DEPS_BEFORE_RUN`，提交被卡住。已经踩脏了就 `rm -rf node_modules && pnpm install`。
 
-```bash
-npm install --no-save typescript typebox @types/node \
-  @earendil-works/pi-coding-agent @earendil-works/pi-tui @earendil-works/pi-ai
-```
+`pnpm-workspace.yaml` 是 pnpm 12 的配置文件：`overrides`（钉住 pi 相关包版本）与
+`allowBuilds`（依赖构建脚本的放行名单）在 pnpm 12 里不再读 `package.json` 的 `pnpm` 字段，
+两处保持同值，旧版 pnpm 走 `package.json`、pnpm 12 走这里。
