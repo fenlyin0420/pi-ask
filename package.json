@@ -1,17 +1,9 @@
 {
-  "name": "@eko24ive/pi-ask",
+  "name": "@fenlyin/pi-ask",
   "version": "1.2.0",
   "description": "Pi package that adds an interactive ask_user clarification tool.",
-  "license": "MIT",
   "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eko24ive/pi-ask.git"
-  },
-  "homepage": "https://github.com/eko24ive/pi-ask#readme",
-  "bugs": {
-    "url": "https://github.com/eko24ive/pi-ask/issues"
-  },
+  "license": "MIT",
   "keywords": [
     "pi-package",
     "pi",
@@ -20,6 +12,14 @@
     "clarification",
     "terminal-ui"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenlyin0420/pi-ask.git"
+  },
+  "homepage": "https://github.com/fenlyin0420/pi-ask#readme",
+  "bugs": {
+    "url": "https://github.com/fenlyin0420/pi-ask/issues"
+  },
   "files": [
     "src/",
     "skills/",
@@ -50,10 +50,6 @@
     "skills": [
       "./skills"
     ]
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   },
   "release": {
     "repositoryUrl": "https://github.com/eko24ive/pi-ask.git",
@@ -126,5 +122,9 @@
     "ignoredBuiltDependencies": [
       "lefthook"
     ]
+  },
+  "author": "fenlyin0420",
+  "publishConfig": {
+    "access": "public"
   }
 }

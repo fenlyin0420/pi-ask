@@ -40,7 +40,7 @@ Review 页的 `Elaborate` 就地展开成和题目里 `Type your own` 一样的�
 
 ## 本机安装方式
 
-`~/.pi/agent/settings.json` 的 `packages` 里用**本地路径包**指向本仓库，而不是 `npm:@eko24ive/pi-ask`。
+`~/.pi/agent/settings.json` 的 `packages` 里用**本地路径包**指向本仓库，而不是 `npm:@fenlyin/pi-ask`。
 
 - **clone 里的 `node_modules` 必须保留**：`typebox`、`@earendil-works/pi-tui` 是 peerDependencies，
   本地路径包只能从自己的 `node_modules` 解析；删掉会让所有 pi 房间的扩展加载失败。

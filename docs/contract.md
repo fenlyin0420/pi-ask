@@ -291,10 +291,10 @@ pi-ask exposes a local `pi.events` contract for trusted Pi extensions. It does n
 
 Channels:
 
-- `@eko24ive/pi-ask:started`
-- `@eko24ive/pi-ask:completed`
-- `@eko24ive/pi-ask:submit`
-- `@eko24ive/pi-ask:submit-result`
+- `@fenlyin/pi-ask:started`
+- `@fenlyin/pi-ask:completed`
+- `@fenlyin/pi-ask:submit`
+- `@fenlyin/pi-ask:submit-result`
 
 Remote submissions must be explicit `{ kind: "answer" }` or `{ kind: "cancel" }` responses. Remote answers use question ids and normalized option values from the started event. pi-ask validates ids and values, recomputes labels/indices, and does not infer approval semantics from labels. An `answer` response may also carry an optional top-level `note`, which becomes `details.note`; blank notes are dropped and a non-string note is rejected as `invalid_answer`.
 

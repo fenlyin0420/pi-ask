@@ -1,15 +1,15 @@
 ![pi-ask main image](docs/media/pi-ask-main.png)
 
-# @eko24ive/pi-ask
+# @fenlyin/pi-ask
 
-[![npm downloads](https://badgen.net/npm/dm/@eko24ive/pi-ask)](https://www.npmjs.com/package/@eko24ive/pi-ask)
-[![last commit](https://badgen.net/github/last-commit/eko24ive/pi-ask?v=4b6c81e)](https://github.com/eko24ive/pi-ask/commits/main)
-[![stars](https://badgen.net/github/stars/eko24ive/pi-ask)](https://github.com/eko24ive/pi-ask/stargazers)
+[![npm downloads](https://badgen.net/npm/dm/@fenlyin/pi-ask)](https://www.npmjs.com/package/@fenlyin/pi-ask)
+[![last commit](https://badgen.net/github/last-commit/fenlyin0420/pi-ask?v=4b6c81e)](https://github.com/fenlyin0420/pi-ask/commits/main)
+[![stars](https://badgen.net/github/stars/fenlyin0420/pi-ask)](https://github.com/fenlyin0420/pi-ask/stargazers)
 
 > [!IMPORTANT]
 > Contributions are welcome in chill mode: please open an issue and link your fork or branch instead of expecting rapid pull-request reviews.
 
-`@eko24ive/pi-ask` is an ask tool that cares about your answers.
+`@fenlyin/pi-ask` is an ask tool that cares about your answers.
 
 It lets an agent pause, ask structured questions in a terminal UI, and continue with normalized answers instead of guessing.
 
@@ -28,19 +28,19 @@ I value contributions and will do my best to credit the people who help, whether
 ## Install
 
 ```bash
-pi install npm:@eko24ive/pi-ask
+pi install npm:@fenlyin/pi-ask
 ```
 
 You can also install from git:
 
 ```bash
-pi install git:github.com/eko24ive/pi-ask
+pi install git:github.com/fenlyin0420/pi-ask
 ```
 
 Or try it without installing (load once for the current run):
 
 ```bash
-pi -e npm:@eko24ive/pi-ask
+pi -e npm:@fenlyin/pi-ask
 ```
 
 ## Features
