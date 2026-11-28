@@ -169,7 +169,11 @@ function formatNonInteractiveMessage(
 	for (const [index, question] of state.questions.entries()) {
 		lines.push(`${index + 1}. ${question.label}: ${question.prompt}`);
 		for (const option of question.options) {
-			lines.push(`   - ${option.label} [${option.value}]`);
+			lines.push(
+				option.value === option.label
+					? `   - ${option.label}`
+					: `   - ${option.label} [${option.value}]`
+			);
 		}
 		lines.push("   - Type your own [custom]");
 	}

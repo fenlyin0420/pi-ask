@@ -437,6 +437,48 @@ test("ask tool prepares missing and blank option labels before schema validation
 	assert.equal(result.details.error, undefined);
 });
 
+test("ask tool prepares missing and blank option values before schema validation", async () => {
+	const { tool } = registerMockTool();
+	const raw = {
+		questions: [
+			{
+				id: "pr_prep",
+				label: "Next step",
+				prompt: "How far should the PR preparation go?",
+				type: "single",
+				options: [
+					{ label: "Cut the branch", description: "Branch, no commits" },
+					{ label: "Draft the issue text" },
+					{ label: "Both" },
+					{ value: "  ", label: "Keep the repo as is" },
+				],
+			},
+		],
+	};
+
+	assert.equal(Value.Check(AskParamsSchema, raw), false);
+	const prepared = tool.prepareArguments(raw) as AskParams;
+	assert.equal(Value.Check(AskParamsSchema, prepared), true);
+	assert.deepEqual(
+		prepared.questions[0]?.options.map((option) => option.value),
+		[
+			"Cut the branch",
+			"Draft the issue text",
+			"Both",
+			"Keep the repo as is",
+		]
+	);
+
+	const result = await tool.execute(
+		"call-prepared-values",
+		prepared,
+		undefined,
+		noop,
+		makeCtx(false)
+	);
+	assert.equal(result.details.error, undefined);
+});
+
 test("public schema requires semantic identifiers and labels", () => {
 	const { tool } = registerMockTool();
 	assert.deepEqual(tool.parameters.required, ["questions"]);

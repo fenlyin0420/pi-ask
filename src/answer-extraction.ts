@@ -11,7 +11,7 @@ import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Value } from "typebox/value";
 import type { AskConfig } from "./config/schema.ts";
 import { AnswerExtractionParamsSchema } from "./schema.ts";
-import { collectValidationIssues } from "./state/normalize.ts";
+import { collectValidationIssues, prepareAskParams } from "./state/normalize.ts";
 import type { AskParams } from "./types.ts";
 
 const ANSWER_EXTRACTION_TOOL_NAME = "ask_user";
@@ -240,7 +240,8 @@ export function parseExtractionCandidate(
 	}
 }
 
-function parseExtractionValue(value: unknown): ParsedExtraction {
+function parseExtractionValue(input: unknown): ParsedExtraction {
+	const value = prepareAskParams(input);
 	const [shapeIssue] = Value.Errors(AnswerExtractionParamsSchema, value);
 	if (shapeIssue) {
 		return {

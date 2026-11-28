@@ -56,20 +56,24 @@ export function prepareAskParams(input: unknown): unknown {
 	};
 }
 
+// Models routinely send only one of `value` and `label`. Either one is enough to derive the other before schema
+// validation, so an option that carries a usable label is never rejected for a missing or blank value.
 function prepareOption(input: unknown): unknown {
 	if (!isRecord(input)) {
 		return input;
 	}
-	if (
-		input.label !== undefined &&
-		!(typeof input.label === "string" && !input.label.trim())
-	) {
+	const label = trimmedText(input.label);
+	const value = trimmedText(input.value);
+	if (label && value) {
 		return input;
 	}
-	if (typeof input.value !== "string") {
+	if (label) {
+		return { ...input, value: label };
+	}
+	if (!value) {
 		return input;
 	}
-	const words = input.value.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+	const words = value.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
 	if (!words) {
 		return input;
 	}
@@ -77,6 +81,10 @@ function prepareOption(input: unknown): unknown {
 		...input,
 		label: words.charAt(0).toUpperCase() + words.slice(1),
 	};
+}
+
+function trimmedText(input: unknown): string {
+	return typeof input === "string" ? input.trim() : "";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
